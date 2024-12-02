@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <label for=""><br>
+        Please enter a unicorn name <br>
+        <input type="text" id="unicornName" />
+    </label> <br>
+
+    <label for=""><br>
+        Please enter a unicorn gender <br>
+        <input type="text" id="unicornGender" />
+    </label><br>
+
+    <label for=""><br>
+        Please enter what unicorn loves <br>
+        <input type="text" id="unicornloves" />
+    </label>
+
+    <label for=""><br>
+        Please enter what unicorn vampires <br>
+        <input type="text" id="unicornvampires" />
+    </label><br>
+
+    <label for=""><br>
+        Please enter weight greater than <br>
+        <input type="text" id="unicornweight" />
+    </label><br>
+
+
+
+    <button id="sendBtn">Click ME!</button>
+
+    <div id="resultDiv"></div>
+
+    <script>
+        sendBtn.addEventListener("click", async () => {
+            try {
+                queryStringToSendToTheServer = "";
+                if (unicornName.value)
+                    queryStringToSendToTheServer += `name=${unicornName.value}&`;
+
+                if (unicornGender.value)
+                    queryStringToSendToTheServer += `gender=${unicornGender.value}&`;
+
+                if (unicornGender.value)
+                    queryStringToSendToTheServer += `loves=${unicornGender.loves}&`;
+
+                if (unicornGender.value)
+                    queryStringToSendToTheServer += `vampires=${unicornGender.vampires}&`;
+
+                if (unicornGender.value)
+                    queryStringToSendToTheServer += `weight=${unicornGender.weight}&`;
+                const result = await fetch(`http://localhost:3000/unicorns?${queryStringToSendToTheServer}`);
+                const resultJSON = await result.json();
+                resultDiv.innerHTML = JSON.stringify(resultJSON);
+            } catch (error) {
+                console.log(error);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,223 @@
+
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Document</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <script src="https://cdn.tailwindcss.com"></script>
+                </head>
+
+                <body>
+                    <div>
+                   
+
+                        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+                        
+                            <div>
+                                <div>
+                                    <label for="unicornName">Name:</label>
+                                    <input type="text" id="unicornName"
+                                        class="w-full border"
+                                        placeholder="Enter unicorn name">
+                                </div>
+                                <div>
+                                    <label for="unicornLoves"
+                                        class="block text-gray-600">Loves:</label>
+                                    <input type="text" id="unicornLoves"
+                                        class="w-full border"
+                                        placeholder="e.g., rainbows, sugar">
+                                </div>
+                                <div>
+                                    <label for="unicornWeight" class="block text-gray-600">Weight
+                                        Greater Than:</label>
+                                    <input type="number" id="unicornWeight"
+                                        class="w-full border"
+                                        placeholder="Weight in kg">
+                                </div>
+                                <div>
+                                    <label for="unicornGender"
+                                        class="block text-gray-600">Gender:</label>
+                                    <select id="unicornGender"
+                                        class="w-full border">
+                                        <option value="any">Any</option>
+                                        <option value="m">Male</option>
+                                        <option value="f">Female</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="unicornVampires" class="block text-gray-600">Vampires
+                                        Greater
+                                        Than:</label>
+                                    <input type="number" id="unicornVampires"
+                                        class="w-full border"
+                                        placeholder="Number of vampires">
+                                </div>
+                                <div>
+                                    <label for="unicornVaccinated"
+                                        class="block text-gray-600">Vaccinated:</label>
+                                    <select id="unicornVaccinated"
+                                        class="w-full border">
+                                        <option value="any">Any</option>
+                                        <option value="true">True</option>
+                                        <option value="false">False</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="unicornSort" class="block text-gray-600">Sort
+                                        By:</label>
+                                    <input type="text" id="unicornSort"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        placeholder="">
+                                </div>
+                            </div>
+                            <div class="bg-gray-100">
+                                <button id="submitBtn" type="submit"
+                                    class="bg-blue">
+                                    submit
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+
+                            <div id="checkboxes" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="toggle-column" data-column="0" value="name" checked>
+                                    <span class="ml-2 text-gray-600">Name</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="toggle-column" data-column="1" value="weight" checked>
+                                    <span class="ml-2 text-gray-600">Weight</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="toggle-column" data-column="2" value="vampires"
+                                        checked>
+                                    <span class="ml-2 text-gray-600">Vampires</span>
+                                </label>
+
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="bg-white shadow-md rounded-lg p-6">
+                            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Results</h2>
+                            <div class="overflow-x-auto">
+                                <table id="resultDiv" class="w-full border-collapse">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        submitBtn.addEventListener('click', async () => {
+                            try {
+                                queryStringToSendToTheServer = "";
+                                if (unicornName.value)
+                                    queryStringToSendToTheServer += `name=${unicornName.value}&`;
+
+                                if (unicornGender.value)
+                                    queryStringToSendToTheServer += `gender=${unicornGender.value}&`;
+
+                                if (unicornLoves.value) {
+                                    const lovesArray = unicornLoves.value.split(',').map(item => item.trim());
+                                    queryStringToSendToTheServer += `loves=${lovesArray.join(',')}&`;
+                                }
+
+                                if (unicornWeight.value)
+                                    queryStringToSendToTheServer += `weight=${unicornWeight.value}&`;
+
+                                if (unicornVampires.value)
+                                    queryStringToSendToTheServer += `vampires=${unicornVampires.value}&`;
+
+                                if (unicornVaccinated.value)
+                                    queryStringToSendToTheServer += `vaccinated=${unicornVaccinated.value}&`;
+
+                                if (unicornSort.value)
+                                    queryStringToSendToTheServer += `sort=${unicornSort.value}&`;
+                                console.log(queryStringToSendToTheServer);
+
+
+                                const result = await fetch(`http://localhost:3000/unicorns?${queryStringToSendToTheServer}`);
+                                const resultJson = await result.json();
+
+                                const sortinput = unicornSort.value.split(' ');
+                                const sortfield = sortinput[0];
+                                const sortorder = parseInt(sortinput[1]) || 1;
+
+                                if (sortfield === 'name') {
+                                    resultJson.sort((a, b) => {
+                                        const nameA = a.name.toLowerCase();
+                                        const nameB = b.name.toLowerCase();
+                                        if (sortorder === 1) {
+                                            return nameA.localeCompare(nameB);
+                                        } else {
+                                            return nameB.localeCompare(nameA);
+                                        }
+                                    });
+
+                                } else if (sortfield === 'weight') {
+                                    resultJson.sort((a, b) => {
+                                        if (sortorder === 1) {
+                                            return a.weight - b.weight;
+                                        }
+                                        else {
+                                            return b.weight - a.weight;
+                                        };
+                                    });
+                                }
+
+                                resultDiv.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Weight</th>
+                        <th>Vampires</th>
+                        <th>Vaccinated</th>
+                        <th>Gender</th>
+                        <th>Loves</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                `;
+
+                                resultJson.forEach(unicorn => {
+                                    resultDiv.innerHTML += `
+                    <tr>
+                        <td>${unicorn.name}</td>
+                        <td>${unicorn.weight}</td>
+                        <td>${unicorn.vampires}</td>
+                        <td>${unicorn.vaccinated}</td>
+                        <td>${unicorn.gender}</td>
+                        <td>${unicorn.loves?.join(', ') || 'N/A'}</td>
+                        
+                    </tr>
+                    `;
+                                });
+
+                                resultDiv.innerHTML += `</tbody>`;
+
+                            } catch (error) {
+                                console.log(error);
+                                resultDiv.innerHTML = `<tr><td colspan="7" class="text-red-600 px-4 py-2">Failed to fetch unicorns</td></tr>`;
+                            }
+                            document.querySelectorAll(".toggle-column").forEach(checkbox => {
+                                checkbox.addEventListener("change", () => {
+                                    const columnIndex = event.target.getAttribute("data-column");
+                                    const table = document.getElementById("resultDiv");
+
+                                    Array.from(table.rows).forEach(row => {
+                                        const cell = row.cells[columnIndex];
+                                        if (cell) {
+                                            cell.style.display = event.target.checked ? '' : "none";
+                                        }
+
+                                    })
+                                })
+                            }
+                            )
+                        })
+                    </script>
+                </body>
+
+                </html>
+        
